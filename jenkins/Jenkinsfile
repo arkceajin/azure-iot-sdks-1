@@ -37,6 +37,14 @@ node {
         sh 'jenkins/linux_java.sh'
     }
 
+    stage 'Build C'
+    withCredentials([
+        [$class: 'StringBinding', credentialsId: '05294bb0-93c3-4f01-a258-666586a3917c', variable: 'IOTHUB_CONNECTION_STRING'],
+        [$class: 'StringBinding', credentialsId: '4a97c867-c403-4c77-839b-5eabf39feafe', variable: 'STORAGE_ACCOUNT_CONNECTION_STRING']])
+    {
+        sh 'jenkins/linux_c.sh'
+    }
+
     stage 'Publish to repository'
     // This is currently the best way to push a branch from a Pipeline job. It's
     // not ideal - https://issues.jenkins-ci.org/browse/JENKINS-28335 is an open
