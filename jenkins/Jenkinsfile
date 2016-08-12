@@ -51,7 +51,7 @@ node {
     {
         def repoAddr = REPO_URI.substring('https://'.length())
         withEnv(["REPO_URI=${repoAddr}"]) {
-            sh 'jenkins/jenkins_push.sh'
+            sh 'git push https://$GITUSR:$GITPASSWD@$REPO_URI --tags'
         }
     }
 }
