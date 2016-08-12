@@ -38,20 +38,23 @@ node {
     }
 
     stage 'Publish to repository'
-    // This is currently the best way to push a tag (or a branch, etc) from a
-    // Pipeline job. It's not ideal - https://issues.jenkins-ci.org/browse/JENKINS-28335
-    // is an open JIRA for getting the GitPublisher Jenkins functionality working
-    // with Pipeline.
+    // This is currently the best way to push a branch from a Pipeline job. It's
+    // not ideal - https://issues.jenkins-ci.org/browse/JENKINS-28335 is an open
+    // JIRA for getting the GitPublisher Jenkins functionality working with
+    // Pipeline.
     // see https://github.com/jenkinsci/pipeline-examples/blob/master/pipeline-examples/push-git-repo/pushGitRepo.Groovy
     withCredentials([[
         $class: 'UsernamePasswordMultiBinding',
         credentialsId: 'cf1ac13d-fc43-450b-9d4d-8352086aa522',
-        usernameVariable: 'GITUSR',
-        passwordVariable: 'GITPASSWD']])
+        usernameVariable: 'GIT_USERNAME',
+        passwordVariable: 'GIT_PASSWORD']])
     {
         def repoAddr = REPO_URI.substring('https://'.length())
-        withEnv(["REPO_URI=${repoAddr}"]) {
-            sh 'git push https://$GITUSR:$GITPASSWD@$REPO_URI --tags'
+        withEnv([
+            "REPO_ADDRESS=${repoAddr}",
+            "DESTINATION_BRANCH=${DESTINATION_BRANCH}"])
+        {
+            sh 'git push https://$GIT_USERNAME:$GIT_PASSWORD@$REPO_ADDRESS HEAD:$DESTINATION_BRANCH'
         }
     }
 }
