@@ -47,6 +47,7 @@ node {
             sh 'jenkins/linux_c.sh --run-e2e-tests'
         }
     }
+    stage 'Build + test language SDKs'
     parallel parallelBuilds
 
     stage 'Publish to repository'
