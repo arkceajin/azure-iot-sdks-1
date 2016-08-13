@@ -29,22 +29,25 @@ node {
         ]
     )
 
-    stage 'Build Java'
-    withCredentials([
-        [$class: 'StringBinding', credentialsId: '05294bb0-93c3-4f01-a258-666586a3917c', variable: 'IOTHUB_CONNECTION_STRING'],
-        [$class: 'StringBinding', credentialsId: '4a97c867-c403-4c77-839b-5eabf39feafe', variable: 'STORAGE_ACCOUNT_CONNECTION_STRING']])
-    {
-        sh 'jenkins/linux_java.sh'
+    def parallelBuilds = [:]
+    parallelBuilds['Java'] = {
+        withCredentials([
+            [$class: 'StringBinding', credentialsId: '05294bb0-93c3-4f01-a258-666586a3917c', variable: 'IOTHUB_CONNECTION_STRING'],
+            [$class: 'StringBinding', credentialsId: '4a97c867-c403-4c77-839b-5eabf39feafe', variable: 'STORAGE_ACCOUNT_CONNECTION_STRING']])
+        {
+            sh 'jenkins/linux_java.sh'
+        }
     }
-
-    stage 'Build C'
-    withCredentials([
-        [$class: 'StringBinding', credentialsId: '05294bb0-93c3-4f01-a258-666586a3917c', variable: 'IOTHUB_CONNECTION_STRING'],
-        [$class: 'StringBinding', credentialsId: '4a97c867-c403-4c77-839b-5eabf39feafe', variable: 'STORAGE_ACCOUNT_CONNECTION_STRING'],
-        [$class: 'StringBinding', credentialsId: '479fc6e5-1fda-4c7b-977b-8cf5d4675fa7', variable: 'IOTHUB_EVENTHUB_CONNECTION_STRING']])
-    {
-        sh 'jenkins/linux_c.sh --run-e2e-tests'
+    parallelBuilds['C'] = {
+        withCredentials([
+            [$class: 'StringBinding', credentialsId: '05294bb0-93c3-4f01-a258-666586a3917c', variable: 'IOTHUB_CONNECTION_STRING'],
+            [$class: 'StringBinding', credentialsId: '4a97c867-c403-4c77-839b-5eabf39feafe', variable: 'STORAGE_ACCOUNT_CONNECTION_STRING'],
+            [$class: 'StringBinding', credentialsId: '479fc6e5-1fda-4c7b-977b-8cf5d4675fa7', variable: 'IOTHUB_EVENTHUB_CONNECTION_STRING']])
+        {
+            sh 'jenkins/linux_c.sh --run-e2e-tests'
+        }
     }
+    parallel parallelBuilds
 
     stage 'Publish to repository'
     // This is currently the best way to push a branch from a Pipeline job. It's
