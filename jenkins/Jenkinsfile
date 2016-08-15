@@ -29,6 +29,8 @@ node {
         ]
     )
 
+    stash name: 'merged-source', useDefaultExcludes: true
+
     def parallelBuilds = [:]
     parallelBuilds['C'] = {
         withCredentials([
@@ -37,6 +39,7 @@ node {
             [$class: 'StringBinding', credentialsId: '479fc6e5-1fda-4c7b-977b-8cf5d4675fa7', variable: 'IOTHUB_EVENTHUB_CONNECTION_STRING']])
         {
             node('linux') {
+                unstash 'merged-source'
                 sh 'jenkins/linux_c.sh --run-e2e-tests'
             }
         }
@@ -47,6 +50,7 @@ node {
             [$class: 'StringBinding', credentialsId: '4a97c867-c403-4c77-839b-5eabf39feafe', variable: 'STORAGE_ACCOUNT_CONNECTION_STRING']])
         {
             node('linux') {
+                unstash 'merged-source'
                 sh 'jenkins/linux_java.sh'
             }
         }
@@ -59,6 +63,7 @@ node {
         {
             withEnv(['IOTHUB_DEVICE_ID=dlbtest01']) {
                 node('linux') {
+                    unstash 'merged-source'
                     sh 'jenkins/linux_node.sh'
                 }
             }
