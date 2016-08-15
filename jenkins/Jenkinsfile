@@ -50,7 +50,7 @@ node {
     parallelBuilds['Node.js'] = {
         withCredentials ([
             [$class: 'StringBinding', credentialsId: '05294bb0-93c3-4f01-a258-666586a3917c', variable: 'IOTHUB_CONNECTION_STRING'],
-            [$class: 'StringBinding', credentialsId: '4a97c867-c403-4c77-839b-5eabf39feafe', variable: 'STORAGE_CONNECTION_STRING'],
+            [$class: 'StringBinding', credentialsId: '04b5e12d-fa48-42a4-b9e3-58d4255669f6', variable: 'STORAGE_CONNECTION_STRING'],
             [$class: 'StringBinding', credentialsId: '954cb13d-66df-4c8e-9dca-1ae25b9a4db8', variable: 'IOTHUB_DEVICE_KEY']])
         {
             withEnv(['IOTHUB_DEVICE_ID=dlbtest01']) {
