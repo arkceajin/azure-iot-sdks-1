@@ -33,36 +33,36 @@ node {
 
     def parallelBuilds = [:]
     parallelBuilds['C'] = {
-        withCredentials([
-            [$class: 'StringBinding', credentialsId: '05294bb0-93c3-4f01-a258-666586a3917c', variable: 'IOTHUB_CONNECTION_STRING'],
-            [$class: 'StringBinding', credentialsId: '4a97c867-c403-4c77-839b-5eabf39feafe', variable: 'STORAGE_ACCOUNT_CONNECTION_STRING'],
-            [$class: 'StringBinding', credentialsId: '479fc6e5-1fda-4c7b-977b-8cf5d4675fa7', variable: 'IOTHUB_EVENTHUB_CONNECTION_STRING']])
-        {
-            node('linux') {
+        node('linux') {
+            withCredentials([
+                [$class: 'StringBinding', credentialsId: '05294bb0-93c3-4f01-a258-666586a3917c', variable: 'IOTHUB_CONNECTION_STRING'],
+                [$class: 'StringBinding', credentialsId: '4a97c867-c403-4c77-839b-5eabf39feafe', variable: 'STORAGE_ACCOUNT_CONNECTION_STRING'],
+                [$class: 'StringBinding', credentialsId: '479fc6e5-1fda-4c7b-977b-8cf5d4675fa7', variable: 'IOTHUB_EVENTHUB_CONNECTION_STRING']])
+            {
                 unstash 'merged-source'
                 sh 'jenkins/linux_c.sh --run-e2e-tests'
             }
         }
     }
     parallelBuilds['Java'] = {
-        withCredentials([
-            [$class: 'StringBinding', credentialsId: '05294bb0-93c3-4f01-a258-666586a3917c', variable: 'IOTHUB_CONNECTION_STRING'],
-            [$class: 'StringBinding', credentialsId: '4a97c867-c403-4c77-839b-5eabf39feafe', variable: 'STORAGE_ACCOUNT_CONNECTION_STRING']])
-        {
-            node('linux') {
+        node('linux') {
+            withCredentials([
+                [$class: 'StringBinding', credentialsId: '05294bb0-93c3-4f01-a258-666586a3917c', variable: 'IOTHUB_CONNECTION_STRING'],
+                [$class: 'StringBinding', credentialsId: '4a97c867-c403-4c77-839b-5eabf39feafe', variable: 'STORAGE_ACCOUNT_CONNECTION_STRING']])
+            {
                 unstash 'merged-source'
                 sh 'jenkins/linux_java.sh'
             }
         }
     }
     parallelBuilds['Node.js'] = {
-        withCredentials ([
-            [$class: 'StringBinding', credentialsId: '05294bb0-93c3-4f01-a258-666586a3917c', variable: 'IOTHUB_CONNECTION_STRING'],
-            [$class: 'StringBinding', credentialsId: '04b5e12d-fa48-42a4-b9e3-58d4255669f6', variable: 'STORAGE_CONNECTION_STRING'],
-            [$class: 'StringBinding', credentialsId: '954cb13d-66df-4c8e-9dca-1ae25b9a4db8', variable: 'IOTHUB_DEVICE_KEY']])
-        {
-            withEnv(['IOTHUB_DEVICE_ID=dlbtest01']) {
-                node('linux') {
+        node('linux') {
+            withCredentials ([
+                [$class: 'StringBinding', credentialsId: '05294bb0-93c3-4f01-a258-666586a3917c', variable: 'IOTHUB_CONNECTION_STRING'],
+                [$class: 'StringBinding', credentialsId: '04b5e12d-fa48-42a4-b9e3-58d4255669f6', variable: 'STORAGE_CONNECTION_STRING'],
+                [$class: 'StringBinding', credentialsId: '954cb13d-66df-4c8e-9dca-1ae25b9a4db8', variable: 'IOTHUB_DEVICE_KEY']])
+            {
+                withEnv(['IOTHUB_DEVICE_ID=dlbtest01']) {
                     unstash 'merged-source'
                     sh 'jenkins/linux_node.sh'
                 }
@@ -71,6 +71,7 @@ node {
     }
     
     stage 'Build + test language SDKs'
+    parallelBuilds.failFast = true
     parallel parallelBuilds
 
     stage 'Publish to repository'
