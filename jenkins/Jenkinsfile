@@ -31,8 +31,8 @@ node {
 
     stash name: 'merged-source', useDefaultExcludes: true
 
-    def parallelBuilds = [:]
-    parallelBuilds['C'] = {
+    def builds = [:]
+    builds['C'] = {
         node('linux') {
             withCredentials([
                 [$class: 'StringBinding', credentialsId: '05294bb0-93c3-4f01-a258-666586a3917c', variable: 'IOTHUB_CONNECTION_STRING'],
@@ -44,7 +44,7 @@ node {
             }
         }
     }
-    parallelBuilds['Java'] = {
+    builds['Java'] = {
         node('linux') {
             withCredentials([
                 [$class: 'StringBinding', credentialsId: '05294bb0-93c3-4f01-a258-666586a3917c', variable: 'IOTHUB_CONNECTION_STRING'],
@@ -55,7 +55,7 @@ node {
             }
         }
     }
-    parallelBuilds['Node.js'] = {
+    builds['Node.js'] = {
         node('linux') {
             withCredentials ([
                 [$class: 'StringBinding', credentialsId: '05294bb0-93c3-4f01-a258-666586a3917c', variable: 'IOTHUB_CONNECTION_STRING'],
@@ -71,8 +71,8 @@ node {
     }
     
     stage 'Build + test language SDKs'
-    parallelBuilds.failFast = true
-    parallel parallelBuilds
+    // builds.failFast = true // looks like failFast doesn't work right now (https://issues.jenkins-ci.org/browse/JENKINS-35647)
+    parallel builds
 
     stage 'Publish to repository'
     // This is currently the best way to push a branch from a Pipeline job. It's
